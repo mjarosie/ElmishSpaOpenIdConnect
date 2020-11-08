@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <DefineConstants>FABLE_COMPILER</DefineConstants>
+        <DefineConstants>DEBUG</DefineConstants>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="index.html" />
+        <Compile Include="Types.fs" />
+        <Compile Include="Home.fs" />
+        <Compile Include="Callback.fs" />
+        <Compile Include="Extensions.fs" />
+        <Compile Include="App.fs" />
+        <Compile Include="Main.fs" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Fable.Core" Version="3.1.6" />
+      <PackageReference Include="Fable.Elmish" Version="3.1.0" />
+      <PackageReference Include="Fable.Elmish.Browser" Version="3.0.4" />
+      <PackageReference Include="Fable.Elmish.Debugger" Version="3.2.0" />
+      <PackageReference Include="Fable.Elmish.HMR" Version="4.0.1" />
+      <PackageReference Include="Fable.Elmish.React" Version="3.0.1" />
+      <PackageReference Include="Fable.OidcClient" Version="1.0.2" />
+      <PackageReference Include="Fable.Promise" Version="2.1.0" />
+      <PackageReference Include="Fable.React" Version="7.0.1" />
+    </ItemGroup>
+</Project>
