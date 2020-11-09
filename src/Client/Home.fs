@@ -3,18 +3,23 @@ module Home
 
 open Fable.React
 open Fable.React.Props
+open Types
 
-type Msg =
-    | NavigateToLogin
-    | NavigateToLogout
-
-let view (dispatch : Msg -> unit) =
+let view (user: ApplicationUser) =
     div [ ] [
-        str "Hello"
-        div [] [
-            button [ OnClick (fun _ -> dispatch NavigateToLogin) ] [ str "Login" ]
-        ]
-        div [] [
-            button [ OnClick (fun _ -> dispatch NavigateToLogout) ] [ str "Logout" ]
-        ]
+        match user with
+        | LoggedIn user ->
+            str (sprintf "Hello, %A (#%A)" user.Profile.name user.SubjectId)
+            div [] [
+                a [ Href "#/logout" ] [
+                    button [] [ str "Logout" ]
+                ]
+            ]
+        | Anonymous ->
+            str "Hello, anonymous"
+            div [] [
+                a [ Href "#/login" ] [
+                    button [] [ str "Login" ]
+                ]
+            ]
     ]

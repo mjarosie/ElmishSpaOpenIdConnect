@@ -5,6 +5,7 @@ open Fable.Core.JsInterop
 open Fable.React
 open Elmish
 open Elmish.Navigation
+open Browser
 
 type Model = {
     Code: string
@@ -33,10 +34,12 @@ let update (msg: Msg) (model: Model): Model * Cmd<Msg> =
         let mgr: Fable.OidcClient.UserManager =
             Fable.OidcClient.Oidc.UserManager.Create !!{| response_mode = Some "query" |}
         model, Cmd.OfPromise.either mgr.signinRedirectCallback () OnSigninCallbackSuccess OnSigninCallbackError
-    | OnSigninCallbackSuccess (user: Fable.OidcClient.User) ->
-        model, Navigation.newUrl "#"
-    | OnSigninCallbackError error ->
-        model, Navigation.newUrl "#"
+    | OnSigninCallbackSuccess user ->
+        console.error "OnSigninCallbackSuccess should be handled from the parent application"
+        model, Navigation.modifyUrl "#"
+    | OnSigninCallbackError e ->
+        console.error "OnSigninCallbackError should be handled from the parent application"
+        model, Navigation.modifyUrl "#"
 
 let view (model: Model) =
     div [ ] [

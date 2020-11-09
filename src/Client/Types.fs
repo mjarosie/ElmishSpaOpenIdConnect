@@ -4,5 +4,11 @@ open System
 
 type User = {
     SubjectId: Guid
-    Name: string
+    AccessToken: string
+    Profile: Fable.OidcClient.Profile
 }
+
+type ApplicationUser =
+    | Anonymous
+    | LoggedIn of User
+

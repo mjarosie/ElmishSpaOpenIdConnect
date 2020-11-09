@@ -7,10 +7,10 @@
     </PropertyGroup>
     <ItemGroup>
         <None Include="index.html" />
+        <Compile Include="Extensions.fs" />
         <Compile Include="Types.fs" />
         <Compile Include="Home.fs" />
         <Compile Include="Callback.fs" />
-        <Compile Include="Extensions.fs" />
         <Compile Include="App.fs" />
         <Compile Include="Main.fs" />
     </ItemGroup>

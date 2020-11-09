@@ -9,7 +9,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Giraffe" Version="4.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.8" />
     <PackageReference Include="Saturn" Version="0.14.1" />
   </ItemGroup>
 </Project>

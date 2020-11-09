@@ -5,12 +5,13 @@ VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{08CCFCF6-2248-43ED-A6EF-E972A2DA0E6A}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		build.fsx = build.fsx
+		global.json = global.json
 		package-lock.json = package-lock.json
 		package.json = package.json
 		README.md = README.md
 		webpack.config.js = webpack.config.js
-		webpack.tests.config.js = webpack.tests.config.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F84DCF8A-FC1A-4677-AF4D-616AD7DB3470}"
@@ -20,6 +21,11 @@ EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Client", "src\Client\Client.fsproj", "{8F1A0074-C392-4975-8020-55176D9CB0B5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "src\IdentityServer\IdentityServer.csproj", "{FF04A720-CA16-44CC-B068-3570DFAE98DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".config", ".config", "{EF7C37F7-9CB5-4368-8A32-1ED416EE2C3B}"
+	ProjectSection(SolutionItems) = preProject
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +81,7 @@ Global
 		{B56110F0-2D27-4718-8C80-E7FDE3439A63} = {F84DCF8A-FC1A-4677-AF4D-616AD7DB3470}
 		{8F1A0074-C392-4975-8020-55176D9CB0B5} = {F84DCF8A-FC1A-4677-AF4D-616AD7DB3470}
 		{FF04A720-CA16-44CC-B068-3570DFAE98DB} = {F84DCF8A-FC1A-4677-AF4D-616AD7DB3470}
+		{EF7C37F7-9CB5-4368-8A32-1ED416EE2C3B} = {08CCFCF6-2248-43ED-A6EF-E972A2DA0E6A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3C3C8754-6249-4D9A-8A07-D025BAB9281C}

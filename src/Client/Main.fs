@@ -11,7 +11,7 @@ open Elmish.UrlParser
 #endif
 
 Program.mkProgram App.init App.update App.view
-|> Program.toNavigable (parseHash App.Router.router) App.urlUpdate
+|> Program.toNavigable (parseHash App.router) App.urlUpdate
 #if DEBUG
 |> Program.withConsoleTrace
 #endif
