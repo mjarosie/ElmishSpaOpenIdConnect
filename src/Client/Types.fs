@@ -12,3 +12,7 @@ type ApplicationUser =
     | Anonymous
     | LoggedIn of User
 
+type Todo = { 
+    Id : Guid
+    Description : string 
+}

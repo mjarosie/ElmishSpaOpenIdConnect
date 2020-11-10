@@ -38,22 +38,6 @@ namespace IdentityServer
 
                     AllowedScopes = { "scope1" }
                 },
-
-                // interactive client using code flow + pkce
-                new Client
-                {
-                    ClientId = "interactive",
-                    ClientSecrets = { new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
-                    
-                    AllowedGrantTypes = GrantTypes.Code,
-
-                    RedirectUris = { "https://localhost:44300/signin-oidc" },
-                    FrontChannelLogoutUri = "https://localhost:44300/signout-oidc",
-                    PostLogoutRedirectUris = { "https://localhost:44300/signout-callback-oidc" },
-
-                    AllowOfflineAccess = true,
-                    AllowedScopes = { "openid", "profile", "scope2" }
-                },
                 // JavaScript Client
                 new Client
                 {
@@ -62,9 +46,9 @@ namespace IdentityServer
                     AllowedGrantTypes = GrantTypes.Code,
                     RequireClientSecret = false,
 
-                    RedirectUris =           { "https://localhost:8080/#/callback" },
-                    PostLogoutRedirectUris = { "https://localhost:8080" },
-                    AllowedCorsOrigins =     { "https://localhost:8080" },
+                    RedirectUris =           { "http://localhost:8080/#/callback" },
+                    PostLogoutRedirectUris = { "http://localhost:8080" },
+                    AllowedCorsOrigins =     { "http://localhost:8080" },
 
                     AllowedScopes =
                     {

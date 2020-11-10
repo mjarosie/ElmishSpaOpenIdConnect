@@ -20,7 +20,7 @@ var CONFIG = {
     outputDir: './deploy/public',
     assetsDir: './src/Client/public',
     devServerPort: 8080,
-    httpsEnabled: true,
+    httpsEnabled: false,
     // When using webpack-dev-server, you may need to redirect some calls
     // to a external API server. See https://webpack.js.org/configuration/dev-server/#devserver-proxy
     devServerProxy: {

@@ -24,5 +24,7 @@
       <PackageReference Include="Fable.OidcClient" Version="1.0.2" />
       <PackageReference Include="Fable.Promise" Version="2.1.0" />
       <PackageReference Include="Fable.React" Version="7.0.1" />
+      <PackageReference Include="Fable.SimpleHttp" Version="3.0.0" />
+      <PackageReference Include="Thoth.Json" Version="5.0.0" />
     </ItemGroup>
 </Project>
