@@ -2,6 +2,13 @@
 
 This repository shows an example implementation of Elmish SPA leveraging the OpenID Connect protocol for carrying out user authentication and authorization.
 
+The application is very simple. Depending on whether the user is authenticated or not - it displays a `login` button, or user's name, ID, hardcoded TODO list (retrieved over an API - different for every user) and a `logout` button.
+
+There are 2 predefined users that you can try out:
+
+- `alice` (password: `alice`)
+- `bob` (password: `bob`)
+
 ## Install pre-requisites
 You'll need to install the following pre-requisites in order to build the application:
 
@@ -22,6 +29,12 @@ To concurrently run the server, IdentityServer4 (OpenID Connect identity provide
 dotnet fake build -t run
 ```
 
-Then open `https://localhost:8080` in your browser.
+Then open `http://localhost:8080` in your browser. Note that the app is not served over https with Webpack. You can change it by:
 
-You might be asked to accept the risk of invalid local certificate in your browser.
+- modifying `webpack.config.js` configuration file by setting `CONFIG.httpsEnabled` to `true`
+- modify the client by changing `src/Client/App.fs`: `settings: UserManagerSettings` record fields `redirect_uri` and `post_logout_redirect_uri` should be prefixed with `https`
+- modify IdentityServer configuration by changing `src/IdentityServer/Config.cs`: JavaScript client fields `RedirectUris`, `PostLogoutRedirectUris` and `AllowedCorsOrigins` should be prefixed with `https`
+- modify the API server by changing `src/Api/App.fs`: modify the `use_cors` operation of the `app` computation expression (it should mention `https`)
+
+You will need to accept invalid certificate risk when navigating between pages on Chrome. Firefox will not even allow you to temporarily accept the certificate.
+
