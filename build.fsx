@@ -1,6 +1,7 @@
-#r "paket: groupref build //"
+#r "paket:
+nuget Fake.DotNet.Cli
+nuget Fake.Core.Target //"
 #load "./.fake/build.fsx/intellisense.fsx"
-#r "netstandard"
 
 open Fake.Core
 open Fake.DotNet
@@ -8,9 +9,8 @@ open Fake.IO
 
 Target.initEnvironment ()
 
-let sharedPath = Path.getFullName "./src/Shared"
-let serverPath = Path.getFullName "./src/Server"
-let deployDir = Path.getFullName "./deploy"
+let apiPath = Path.getFullName "./src/Api"
+let identityServerPath = Path.getFullName "./src/IdentityServer"
 
 let npm args workingDir =
     let npmPath =
@@ -34,13 +34,13 @@ let dotnet cmd workingDir =
     let result = DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
-Target.create "Clean" (fun _ -> Shell.cleanDir deployDir)
+Target.create "Clean" (fun _ -> dotnet "clean" ".")
 
 Target.create "InstallClient" (fun _ -> npm "install" ".")
 
 Target.create "Run" (fun _ ->
-    dotnet "build" sharedPath
-    [ async { dotnet "watch run" serverPath }
+    [ async { dotnet "watch run" apiPath }
+      async { dotnet "watch run" identityServerPath }
       async { npm "start" "." } ]
     |> Async.Parallel
     |> Async.RunSynchronously
@@ -51,9 +51,9 @@ open Fake.Core.TargetOperators
 
 "Clean"
     ==> "InstallClient"
+    ==> "Run"
 
-"Clean"
-    ==> "InstallClient"
+"InstallClient"
     ==> "Run"
 
 Target.runOrDefaultWithArguments "Run"
