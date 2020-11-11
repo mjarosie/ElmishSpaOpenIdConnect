@@ -11,7 +11,7 @@ open System
 open Types
 open Browser
 
-let settings: UserManagerSettings = 
+let signinSignoutUserManagerSettings: UserManagerSettings = 
     !!{| 
         authority = Some "https://localhost:5001"
         client_id = Some "js"
@@ -23,21 +23,30 @@ let settings: UserManagerSettings =
         filterProtocolClaims = Some true
         loadUserInfo = Some true
     |}
-    
-let mgr: UserManager = Oidc.UserManager.Create settings
+let signinSignoutUserManager: UserManager = Oidc.UserManager.Create signinSignoutUserManagerSettings
+
+let callbackUserManager: UserManager = Oidc.UserManager.Create !!{| response_mode = Some "query" |}
+
+type CallbackQueryParams = {
+    code: string
+    scopes: string list
+    state: string
+    session_state: string
+}
 
 type Url =
     | Home
     | Login
     | Logout
-    | Callback of Callback.CallbackQueryParams
+    | Callback of CallbackQueryParams
 
-    with static member CallbackQueryParams (code: Option<string>) (scope: Option<string>) (state: Option<string>) (session_state: Option<string>) : Url =
-            match code, scope, state, session_state with
-            | Some code, Some scopesRaw, Some state, Some session_state ->
-                let scopesList = scopesRaw.Split [|' '|] |> Seq.toList
-                Callback ({ code = code; scopes = scopesList; state = state; session_state = session_state })
-            | _ -> Home
+    with 
+    static member CallbackQueryParams (code: Option<string>) (scope: Option<string>) (state: Option<string>) (session_state: Option<string>) : Url =
+        match code, scope, state, session_state with
+        | Some code, Some scopesRaw, Some state, Some session_state ->
+            let scopesList = scopesRaw.Split [|' '|] |> Seq.toList
+            Callback ({ code = code; scopes = scopesList; state = state; session_state = session_state })
+        | _ -> Home
     
 let router: Parser<Url -> Url, Url>  =
     oneOf [
@@ -51,7 +60,7 @@ type Page =
     | Home of Home.Model
     | Login // Dummy page, our app won't display it but will redirect to our Identity Provider.
     | Logout // Dummy page, our app won't display it but will redirect to our Identity Provider.
-    | Callback of Callback.Model
+    | Callback // Dummy page, our app will redirect to homepage right after handling the callback from Identity Provider.
 
 type Model =
     { User: ApplicationUser
@@ -60,7 +69,8 @@ type Model =
 
 type Msg =
     | HomeMsg of Home.Msg
-    | CallbackMsg of Callback.Msg
+    | OnSigninCallbackSuccess of Fable.OidcClient.User
+    | OnSigninCallbackError of exn
     | UrlChanged of Url
 
 let init (initialUrl:Option<Url>): Model * Cmd<Msg> =
@@ -71,14 +81,22 @@ let init (initialUrl:Option<Url>): Model * Cmd<Msg> =
         { User = Anonymous; CurrentPage = Page.Home homeModel; CurrentUrl = currentUrl }, Cmd.map HomeMsg homeCmd
 
     | Url.Callback callbackQueryParams ->
-        let callbackModel, callbackCmd = Callback.init callbackQueryParams
-        { User = Anonymous; CurrentPage = Page.Callback callbackModel; CurrentUrl = currentUrl }, Cmd.map CallbackMsg callbackCmd
+        // Here you can use callbackQueryParams for debugging purposes, or get rid of it in the `Url.Callback` field altogether.
+        let model = { User = Anonymous; CurrentPage = Page.Callback; CurrentUrl = currentUrl }
+        // If `signinRedirectCallback` succeeds - `OnSigninCallbackSuccess` command will be produced
+        // otherwise - `OnSigninCallbackError` command will be produced
+        let cmd = Cmd.OfPromise.either callbackUserManager.signinRedirectCallback () OnSigninCallbackSuccess OnSigninCallbackError
+        model, cmd
 
     | Url.Login ->
-        { User = Anonymous; CurrentPage = Page.Login; CurrentUrl = currentUrl }, Cmd.ofSub (fun _ -> mgr.signinRedirect() |> Promise.start)
+        let model = { User = Anonymous; CurrentPage = Page.Login; CurrentUrl = currentUrl }
+        let cmd = Cmd.ofSub (fun _ -> signinSignoutUserManager.signinRedirect() |> Promise.start)
+        model, cmd
 
     | Url.Logout ->
-        { User = Anonymous; CurrentPage = Page.Logout; CurrentUrl = currentUrl }, Cmd.ofSub (fun _ -> mgr.signoutRedirect() |> Promise.start)
+        let model = { User = Anonymous; CurrentPage = Page.Logout; CurrentUrl = currentUrl }
+        let cmd = Cmd.ofSub (fun _ -> signinSignoutUserManager.signoutRedirect() |> Promise.start)
+        model, cmd
 
 let update (msg: Msg) (model: Model): Model * Cmd<Msg> =
     match msg, model.CurrentPage with
@@ -89,36 +107,31 @@ let update (msg: Msg) (model: Model): Model * Cmd<Msg> =
     | HomeMsg _, _ ->
         model, Cmd.none
 
-    | CallbackMsg (Callback.Msg.OnSigninCallbackSuccess user), Callback _ ->
-        console.log "access_token:"
-        console.log user.access_token
-        console.log "id_token:"
-        console.log user.id_token
+    | OnSigninCallbackSuccess user, Callback _ ->
         let subjectId = Guid.Parse user.profile.sub
         let applicationUser = LoggedIn { SubjectId = subjectId; AccessToken = user.access_token; Profile = user.profile }
 
         let updatedModel = { model with User = applicationUser }
 
         updatedModel, Navigation.newUrl "#"
-            
-    | CallbackMsg (Callback.Msg.OnSigninCallbackError err), Callback _ ->
+
+    | OnSigninCallbackSuccess user, _ ->
+        model, Cmd.none
+
+    | OnSigninCallbackError err, Callback _ ->
         console.error err
         model, Navigation.newUrl "#"
 
-    | CallbackMsg callbackMsg, Callback callbackModel ->
-        let updatedCallbackModel, callbackCmd = Callback.update callbackMsg callbackModel
-        { model with CurrentPage = Page.Callback updatedCallbackModel }, Cmd.map CallbackMsg callbackCmd
-
-    | CallbackMsg _, _ ->
+    | OnSigninCallbackError err, _ ->
         model, Cmd.none
 
     | UrlChanged url, _ ->
         match url with
         | Url.Login ->
-            { model with CurrentPage = Page.Login; CurrentUrl = url }, Cmd.ofSub (fun _ -> mgr.signinRedirect() |> Promise.start)
+            { model with CurrentPage = Page.Login; CurrentUrl = url }, Cmd.ofSub (fun _ -> signinSignoutUserManager.signinRedirect() |> Promise.start)
 
         | Url.Logout ->
-            { model with CurrentPage = Page.Logout; CurrentUrl = url }, Cmd.ofSub (fun _ -> mgr.signoutRedirect() |> Promise.start)
+            { model with CurrentPage = Page.Logout; CurrentUrl = url }, Cmd.ofSub (fun _ -> signinSignoutUserManager.signoutRedirect() |> Promise.start)
 
         | Url.Home ->
             let homeModel, homeCmd = Home.init model.User
